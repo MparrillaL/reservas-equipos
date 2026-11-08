@@ -9,6 +9,7 @@ const HASH_LUIS = bcrypt.hashSync('Luis12345', COSTE);
 
 // Funciones que devuelven arrays NUEVOS cada vez (para poder reiniciar)
 export function equiposIniciales() {
+  // Datos de ejemplo para probar equipos operativos y fuera de servicio.
   return [
     { id: 1, codigo: 'PC-001', nombre: 'Ordenador aula 1', tipo: 'sobremesa', estado: 'operativo' },
     { id: 2, codigo: 'PORT-001', nombre: 'Portátil Lenovo', tipo: 'portatil', estado: 'operativo' },
@@ -17,6 +18,7 @@ export function equiposIniciales() {
 }
 
 export function usuariosIniciales() {
+  // Las contraseñas se guardan como hashes, nunca como texto en los usuarios.
   return [
     { id: 1, nombre: 'Administrador', email: 'admin@example.com', passwordHash: HASH_ADMIN, rol: 'admin' },
     { id: 2, nombre: 'Ana García', email: 'ana@example.com', passwordHash: HASH_ANA, rol: 'usuario' },
@@ -25,6 +27,7 @@ export function usuariosIniciales() {
 }
 
 export function reservasIniciales() {
+  // Reservas de ejemplo para mostrar turnos ocupados y cancelados.
   return [
     { id: 1, equipoId: 1, usuarioId: 2, fecha: '2027-01-15', turno: 'manana', estado: 'activa' },
     { id: 2, equipoId: 2, usuarioId: 3, fecha: '2027-01-15', turno: 'tarde', estado: 'activa' },

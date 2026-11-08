@@ -12,6 +12,7 @@ export class ErrorValidacion extends ErrorDominio {      // → 400
     this.errores = errores;   // { campo: 'mensaje' } para mostrarlos en el formulario
   }
 }
+// Estos tipos permiten distinguir fallos de acceso, búsqueda y reglas de negocio.
 export class ErrorCredenciales extends ErrorDominio {}   // → 401
 export class ErrorProhibido extends ErrorDominio {}      // → 403
 export class ErrorNoEncontrado extends ErrorDominio {}   // → 404

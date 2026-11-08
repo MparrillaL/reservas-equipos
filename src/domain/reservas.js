@@ -2,16 +2,16 @@ export const TURNOS = ['manana', 'tarde'];
 
 // Devuelve true si hay una reserva ACTIVA del equipo en esa fecha y turno
 export function estaReservado(equipoId, fecha, turno, reservas) {
-  // TODO (tú): usa some()
-  // Ojo: una reserva CANCELADA no bloquea el equipo
+  // some() termina al encontrar una coincidencia; las canceladas no ocupan el equipo.
   return reservas.some((r) => r.equipoId === equipoId && r.fecha === fecha && r.turno === turno && r.estado !== 'cancelada');
 }
 
-// Devuelve los equipos operativos que NO están reservados en esa fecha y turno
+// Devuelve equipos con estado "activo" que no están reservados en esa fecha y turno.
 export function obtenerEquiposDisponibles(equipos, reservas, fecha, turno) {
-  // TODO (tú): usa filter() y reutiliza estaReservado()
+  // filter() conserva solo equipos operativos que no tienen una reserva activa.
   return equipos.filter((e) => e.estado === 'activo' && !estaReservado(e.id, fecha, turno, reservas));
 }
+
 // Fecha de hoy en formato 'YYYY-MM-DD' según la hora LOCAL (no UTC)
 export function fechaHoy() {
   const d = new Date();
@@ -35,6 +35,7 @@ export function validarReserva(datos, hoy = fechaHoy()) {
   const errores = {};
   const valores = {};   // Valores ya convertidos y limpios
 
+  // Convierte el identificador del equipo a número y exige que sea positivo.
   const equipoId = Number(datos.equipoId);
   if (!Number.isInteger(equipoId) || equipoId <= 0) {
     errores.equipoId = 'Selecciona un equipo válido';
@@ -42,6 +43,7 @@ export function validarReserva(datos, hoy = fechaHoy()) {
     valores.equipoId = equipoId;
   }
 
+  // La fecha debe existir y no puede ser anterior a la fecha actual.
   const fecha = String(datos.fecha ?? '').trim();
   if (!esFechaValida(fecha)) {
     errores.fecha = 'Introduce una fecha válida';
@@ -51,6 +53,7 @@ export function validarReserva(datos, hoy = fechaHoy()) {
     valores.fecha = fecha;
   }
 
+  // Solo se aceptan los turnos definidos al inicio del módulo.
   const turno = String(datos.turno ?? '');
   if (!TURNOS.includes(turno)) {
     errores.turno = 'El turno debe ser mañana o tarde';
@@ -58,5 +61,6 @@ export function validarReserva(datos, hoy = fechaHoy()) {
     valores.turno = turno;
   }
 
+  // Devuelve los errores y los campos limpios para que el servicio decida qué hacer.
   return { valido: Object.keys(errores).length === 0, errores, valores };
 }

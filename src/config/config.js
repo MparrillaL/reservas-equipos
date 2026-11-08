@@ -3,6 +3,7 @@ dotenv.config({ quiet: true });          // Carga .env en process.env (quiet: si
 
 const ENTORNOS_VALIDOS = ['development', 'production', 'test'];
 
+// Convierte las variables de entorno en una configuración comprobada y lista para usar.
 function cargarConfig(env) {
   const errores = [];                    // Acumula TODOS los errores para mostrarlos juntos
 
@@ -38,4 +39,5 @@ function cargarConfig(env) {
   });
 }
 
+// La aplicación recibe la configuración validada una sola vez al cargar este módulo.
 export const config = cargarConfig(process.env);
