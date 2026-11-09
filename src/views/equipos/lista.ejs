@@ -1,0 +1,48 @@
+<%- include('../partials/cabecera') %>
+<h1>Equipos del centro</h1>
+
+<form method="get" action="/equipos" class="filtros">
+  <label>Tipo
+    <select name="tipo">
+      <option value="todos">Todos</option>
+      <% tipos.forEach((t) => { %>
+        <option value="<%= t %>" <%= filtros.tipo === t ? 'selected' : '' %>><%= t %></option>
+      <% }) %>
+    </select>
+  </label>
+  <label>
+    <input type="checkbox" name="operativos" value="true" <%= filtros.soloOperativos ? 'checked' : '' %>>
+    Solo operativos
+  </label>
+  <button type="submit">Filtrar</button>
+</form>
+
+<form method="post" action="/preferencias" class="filtros">
+  <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+  <label>Tipo preferido
+    <select name="tipo">
+      <% tipos.forEach((t) => { %><option value="<%= t %>"><%= t %></option><% }) %>
+    </select>
+  </label>
+  <button type="submit">Guardar preferencia</button>
+</form>
+
+<% if (equipos.length === 0) { %>
+  <p>No hay equipos con esos filtros.</p>
+<% } else { %>
+  <table>
+    <thead><tr><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      <% for (const e of equipos) { %>
+        <tr>
+          <td><%= e.codigo %></td>
+          <td><%= e.nombre %></td>
+          <td><%= e.tipo %></td>
+          <td><span class="estado <%= e.estado %>"><%= e.estado %></span></td>
+          <td><a href="/equipos/<%= e.id %>">Ver ficha</a></td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+<% } %>
+<%- include('../partials/pie') %>

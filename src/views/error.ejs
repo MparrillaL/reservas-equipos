@@ -1,0 +1,10 @@
+<%- include('partials/cabecera') %>
+<h1><%= titulo %></h1>
+<p><%= mensaje %></p>
+<% if (Object.keys(errores).length > 0) { %>
+  <ul>
+    <% for (const msg of Object.values(errores)) { %><li><%= msg %></li><% } %>
+  </ul>
+<% } %>
+<p><a href="/equipos">Volver al inicio</a></p>
+<%- include('partials/pie') %>

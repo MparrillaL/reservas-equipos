@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= locals.titulo || 'Reserva de equipos' %></title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+<header>
+  <nav>
+    <a href="/equipos">Equipos</a>
+    <% if (locals.usuarioActual) { %>
+      <a href="/reservas/nueva">Nueva reserva</a>
+      <a href="/mis-reservas">Mis reservas</a>
+      <% if (usuarioActual.rol === 'admin') { %>
+        <a href="/admin/equipos">Admin equipos</a>
+        <a href="/admin/reservas">Admin reservas</a>
+      <% } %>
+      <a href="/perfil"><%= usuarioActual.nombre %></a>
+      <form method="post" action="/logout" class="en-linea">
+        <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+        <button type="submit">Salir</button>
+      </form>
+    <% } else { %>
+      <a href="/login">Entrar</a>
+      <a href="/registro">Registro</a>
+    <% } %>
+  </nav>
+</header>
+<main>
+<%- include('mensajes') %>

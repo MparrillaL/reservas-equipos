@@ -1,0 +1,14 @@
+<%- include('../partials/cabecera') %>
+<h1><%= equipo.nombre %></h1>
+<dl>
+  <dt>Código</dt><dd><%= equipo.codigo %></dd>
+  <dt>Tipo</dt><dd><%= equipo.tipo %></dd>
+  <dt>Estado</dt><dd><span class="estado <%= equipo.estado %>"><%= equipo.estado %></span></dd>
+</dl>
+<% if (equipo.estado === 'operativo') { %>
+  <p><a href="/reservas/nueva?equipoId=<%= equipo.id %>">Reservar este equipo</a></p>
+<% } else { %>
+  <p>Este equipo no se puede reservar mientras esté fuera de servicio.</p>
+<% } %>
+<p><a href="/equipos">← Volver al catálogo</a></p>
+<%- include('../partials/pie') %>
