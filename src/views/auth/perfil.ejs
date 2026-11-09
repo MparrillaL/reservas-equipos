@@ -1,0 +1,9 @@
+<%- include('../partials/cabecera') %>
+<h1>Mi perfil</h1>
+<dl>
+  <dt>Nombre</dt><dd><%= usuario.nombre %></dd>
+  <dt>Correo</dt><dd><%= usuario.email %></dd>
+  <dt>Rol</dt><dd><%= usuario.rol %></dd>
+</dl>
+<p><a href="/mis-reservas">Ver mis reservas</a></p>
+<%- include('../partials/pie') %>

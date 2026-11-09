@@ -1,0 +1,19 @@
+<%- include('../partials/cabecera') %>
+<h1>Crear cuenta</h1>
+<form method="post" action="/registro" novalidate>
+  <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+  <p>
+    <label>Nombre<br><input name="nombre" value="<%= valores.nombre || '' %>" required></label>
+    <% if (errores.nombre) { %><br><span class="error"><%= errores.nombre %></span><% } %>
+  </p>
+  <p>
+    <label>Correo<br><input type="email" name="email" value="<%= valores.email || '' %>" required></label>
+    <% if (errores.email) { %><br><span class="error"><%= errores.email %></span><% } %>
+  </p>
+  <p>
+    <label>Contraseña<br><input type="password" name="password" required></label>
+    <% if (errores.password) { %><br><span class="error"><%= errores.password %></span><% } %>
+  </p>
+  <button type="submit">Registrarme</button>
+</form>
+<%- include('../partials/pie') %>
