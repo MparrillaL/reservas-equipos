@@ -1,0 +1,44 @@
+<%- include('../partials/cabecera') %>
+<h1>Nueva reserva</h1>
+<% if (errorGeneral) { %><p class="error"><%= errorGeneral %></p><% } %>
+
+<!-- PASO 1: elegir fecha y turno (GET: solo consulta, no modifica nada) -->
+<form method="get" action="/reservas/nueva" class="filtros">
+  <label>Fecha
+    <input type="date" name="fecha" value="<%= fecha %>" min="<%= hoy %>">
+  </label>
+  <% if (errores.fecha) { %><span class="error"><%= errores.fecha %></span><% } %>
+  <label>Turno
+    <select name="turno">
+      <option value="">— Elige —</option>
+      <% turnos.forEach((t) => { %>
+        <option value="<%= t.valor %>" <%= t.seleccionado ? 'selected' : '' %>><%= t.etiqueta %></option>
+      <% }) %>
+    </select>
+  </label>
+  <% if (errores.turno) { %><span class="error"><%= errores.turno %></span><% } %>
+  <button type="submit">Ver equipos disponibles</button>
+</form>
+
+<!-- PASO 2: elegir equipo (POST: modifica → lleva token CSRF) -->
+<% if (mostrarEquipos) { %>
+  <% if (equipos.length === 0) { %>
+    <p>No hay equipos disponibles para esa fecha y turno.</p>
+  <% } else { %>
+    <form method="post" action="/reservas">
+      <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+      <input type="hidden" name="fecha" value="<%= fecha %>">
+      <input type="hidden" name="turno" value="<%= turno %>">
+      <label>Equipo
+        <select name="equipoId">
+          <% equipos.forEach((e) => { %>
+            <option value="<%= e.id %>" <%= e.seleccionado ? 'selected' : '' %>><%= e.texto %></option>
+          <% }) %>
+        </select>
+      </label>
+      <% if (errores.equipoId) { %><span class="error"><%= errores.equipoId %></span><% } %>
+      <button type="submit">Reservar</button>
+    </form>
+  <% } %>
+<% } %>
+<%- include('../partials/pie') %>

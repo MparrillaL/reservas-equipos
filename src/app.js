@@ -10,6 +10,7 @@ import { rutaNoEncontrada, gestorErrores } from './middlewares/errores.js';
 import { proteccionCsrf } from './middlewares/csrf.js';
 import equiposRoutes from './routes/equiposRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import reservasRoutes from './routes/reservasRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -45,6 +46,7 @@ export function crearApp() {
   app.get('/', (req, res) => res.redirect('/equipos'));
   app.use(equiposRoutes);
   app.use(authRoutes);
+  app.use(reservasRoutes);
 
   app.use(rutaNoEncontrada);
   app.use(gestorErrores);
