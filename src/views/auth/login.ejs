@@ -1,5 +1,15 @@
 <%- include('../partials/cabecera') %>
 <h1>Iniciar sesión</h1>
+<% if (locals.esDesarrollo) { %>
+  <aside class="ayuda-dev">
+    <strong>Solo desarrollo · usuarios de prueba</strong>
+    <ul>
+      <li>admin@example.com / Admin1234 (admin)</li>
+      <li>ana@example.com / Ana12345</li>
+      <li>luis@example.com / Luis12345</li>
+    </ul>
+  </aside>
+<% } %>
 <% if (error) { %><p class="error"><%= error %></p><% } %>
 <form method="post" action="/login" novalidate>
   <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">

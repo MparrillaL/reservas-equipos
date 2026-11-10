@@ -7,6 +7,7 @@ import { config } from './config/config.js';
 import { NOMBRE_COOKIE_SESION } from './utils/sesion.js';
 import { cargarUsuario, mensajesFlash } from './middlewares/sesion.js';
 import { rutaNoEncontrada, gestorErrores } from './middlewares/errores.js';
+import { proteccionCsrf } from './middlewares/csrf.js';
 import equiposRoutes from './routes/equiposRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
@@ -18,6 +19,7 @@ export function crearApp() {
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, 'views'));
   if (config.esProduccion) app.set('trust proxy', 1);   // necesario para cookies 'secure' detrás de un proxy HTTPS
+  app.locals.esDesarrollo = config.nodeEnv === 'development';   // disponible en todas las vistas (p. ej. ayuda de login)
 
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
@@ -38,6 +40,7 @@ export function crearApp() {
 
   app.use(cargarUsuario);   // DESPUÉS de session: necesita req.session
   app.use(mensajesFlash);
+  app.use(proteccionCsrf);
 
   app.get('/', (req, res) => res.redirect('/equipos'));
   app.use(equiposRoutes);
