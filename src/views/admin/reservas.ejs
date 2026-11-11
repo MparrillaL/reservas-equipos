@@ -1,0 +1,25 @@
+<%- include('../partials/cabecera') %>
+<h1>Todas las reservas</h1>
+<table>
+  <thead><tr><th>Usuario</th><th>Equipo</th><th>Fecha</th><th>Turno</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+    <% for (const r of reservas) { %>
+      <tr>
+        <td><%= r.usuarioNombre %></td>
+        <td><%= r.equipo ? r.equipo.codigo : '—' %></td>
+        <td><%= r.fecha %></td>
+        <td><%= r.turno === 'manana' ? 'Mañana' : 'Tarde' %></td>
+        <td><%= r.estado %></td>
+        <td>
+          <% if (r.puedeCancelar) { %>
+            <form method="post" action="/admin/reservas/<%= r.id %>/cancelar" class="en-linea">
+              <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+              <button type="submit">Cancelar</button>
+            </form>
+          <% } %>
+        </td>
+      </tr>
+    <% } %>
+  </tbody>
+</table>
+<%- include('../partials/pie') %>

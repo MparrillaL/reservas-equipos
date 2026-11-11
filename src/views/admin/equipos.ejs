@@ -1,0 +1,49 @@
+<%- include('../partials/cabecera') %>
+<h1>Administrar equipos</h1>
+
+<table>
+  <thead><tr><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+    <% for (const e of equipos) { %>
+      <% const nuevoEstado = e.estado === 'operativo' ? 'fuera_de_servicio' : 'operativo'; %>
+      <tr>
+        <td><%= e.codigo %></td>
+        <td><%= e.nombre %></td>
+        <td><%= e.tipo %></td>
+        <td><span class="estado <%= e.estado %>"><%= e.estado %></span></td>
+        <td>
+          <form method="post" action="/admin/equipos/<%= e.id %>/estado" class="en-linea">
+            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+            <input type="hidden" name="estado" value="<%= nuevoEstado %>">
+            <button type="submit">Marcar <%= nuevoEstado %></button>
+          </form>
+        </td>
+      </tr>
+    <% } %>
+  </tbody>
+</table>
+
+<h2>Añadir equipo</h2>
+<form method="post" action="/admin/equipos" novalidate>
+  <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+  <p>
+    <label>Código<br><input name="codigo" value="<%= valores.codigo || '' %>" placeholder="PC-003"></label>
+    <% if (errores.codigo) { %><br><span class="error"><%= errores.codigo %></span><% } %>
+  </p>
+  <p>
+    <label>Nombre<br><input name="nombre" value="<%= valores.nombre || '' %>"></label>
+    <% if (errores.nombre) { %><br><span class="error"><%= errores.nombre %></span><% } %>
+  </p>
+  <p>
+    <label>Tipo<br>
+      <select name="tipo">
+        <% tipos.forEach((t) => { %>
+          <option value="<%= t %>" <%= valores.tipo === t ? 'selected' : '' %>><%= t %></option>
+        <% }) %>
+      </select>
+    </label>
+    <% if (errores.tipo) { %><br><span class="error"><%= errores.tipo %></span><% } %>
+  </p>
+  <button type="submit">Añadir equipo</button>
+</form>
+<%- include('../partials/pie') %>
