@@ -8,7 +8,8 @@ import {
 } from "../domain/errores.js";
 import { parsearId } from "../utils/parsearId.js";
 
-// Calcula los equipos libres SOLO si fecha y turno son válidos (reutiliza validarReserva)
+// Calcula los equipos libres SOLO si fecha y turno son válidos (reutiliza validarReserva de dominio,
+// así la regla de qué es una fecha/turno válidos no se duplica entre el formulario y la creación real)
 function calcularDisponibilidad(fecha, turno) {
   const { errores } = validarReserva({ fecha, turno }); // el error de equipoId se ignora: aún no se ha elegido
   const erroresFT = {};
@@ -46,7 +47,7 @@ function renderFormulario(
 }
 
 export const reservasController = {
-  // GET /reservas/nueva?fecha=2027-01-20&turno=tarde
+  // GET /reservas/nueva?fecha=2027-01-20&turno=tarde — Paso 1 del formulario (elegir fecha y turno)
   nueva(req, res) {
     const fecha = String(req.query.fecha ?? "");
     const turno = String(req.query.turno ?? "");
@@ -73,30 +74,24 @@ export const reservasController = {
 
   // POST /reservas
   crear(req, res) {
-    // TODO 1: dentro de un try, llama a reservasService.crear(usuarioId, datos)
-    //         ⚠️ El usuarioId sale de req.usuario.id (SESIÓN), NUNCA de req.body
+    // El usuarioId sale SIEMPRE de req.usuario.id (dato de la SESIÓN), nunca de req.body:
+    // si se leyera del formulario, cualquiera podría crear una reserva "a nombre de otro".
     let reserva;
     try {
       reserva = reservasService.crear(req.usuario.id, req.body);
     } catch (err) {
-      //
-      // TODO 2: en el catch, según el tipo de error:
-      //   ErrorValidacion   → return renderFormulario(res, 400, req.body, err.errores)
-      //   ErrorConflicto    → return renderFormulario(res, 409, req.body, {}, err.message)
-      //   ErrorNoEncontrado → return renderFormulario(res, 404, req.body, {}, err.message)
-      //   cualquier otro    → throw err
+      // Cada tipo de error de negocio se traduce a su código HTTP y se vuelve a pintar
+      // el formulario con el error correspondiente (conservando fecha, turno y equipo elegidos).
       if (err instanceof ErrorValidacion)
         return renderFormulario(res, 400, req.body, err.errores);
       if (err instanceof ErrorConflicto)
         return renderFormulario(res, 409, req.body, {}, err.message);
       if (err instanceof ErrorNoEncontrado)
         return renderFormulario(res, 404, req.body, {}, err.message);
-      throw err;
+      throw err; // cualquier otro error (inesperado) lo recoge el gestor centralizado
     }
-    //
-    // TODO 3: si todo va bien (después del try/catch):
-    //   - guarda en req.session.mensaje un texto de confirmación
-    //   - redirige con 303 a /mis-reservas
+    // Si todo fue bien: mensaje flash de un solo uso y Post/Redirect/Get a /mis-reservas
+    // (evita que recargar la página reenvíe el formulario y duplique la reserva).
     req.session.mensaje = "Reserva creada con éxito";
     res.redirect(303, "/mis-reservas");
   },
@@ -106,7 +101,7 @@ export const reservasController = {
     const hoy = fechaHoy();
     const reservas = reservasService.deUsuario(req.usuario.id).map((r) => ({
       ...r,
-      puedeCancelar: r.estado === "activa" && r.fecha >= hoy, // solo para mostrar u ocultar el botón
+      puedeCancelar: r.estado === "activa" && r.fecha >= hoy, // solo para mostrar u ocultar el botón; la regla REAL se repite en el servicio
     }));
     res.render("reservas/mis-reservas", { titulo: "Mis reservas", reservas });
   },
@@ -114,11 +109,11 @@ export const reservasController = {
   // POST /reservas/:id/cancelar
   cancelar(req, res) {
     const id = parsearId(req.params.id);
-    // TODO 5: llama a reservasService.cancelar(id, req.usuario)
-    //         Si falla, NO hace falta catch: los errores 403/404/409 los traduce el gestor centralizado
+    // No hace falta try/catch aquí: si reservasService.cancelar lanza ErrorProhibido (403),
+    // ErrorNoEncontrado (404) o ErrorConflicto (409), el gestor centralizado de errores
+    // (src/middlewares/errores.js) ya sabe traducirlos al código HTTP correcto.
     reservasService.cancelar(id, req.usuario);
     req.session.mensaje = "Reserva cancelada con éxito";
-    // TODO 6: mensaje flash + redirect 303 a /mis-reservas
     res.redirect(303, "/mis-reservas");
   },
 };

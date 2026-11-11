@@ -8,13 +8,13 @@ const COOKIE_PREFERENCIA = "tipoPreferido";
 const TREINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
 export const equiposController = {
-  // GET /equipos?tipo=portatil&operativos=true
+  // GET /equipos?tipo=portatil&operativos=true (ruta pública, no requiere sesión)
   listar(req, res) {
     let tipo = req.query.tipo;
     // Prioridad: 1) filtro de la URL  2) cookie de preferencia  3) sin filtro
     if (tipo === undefined) {
       const preferido = req.cookies[COOKIE_PREFERENCIA];
-      tipo = TIPOS_EQUIPO.includes(preferido) ? preferido : ""; // la cookie se VALIDA: el cliente puede manipularla
+      tipo = TIPOS_EQUIPO.includes(preferido) ? preferido : ""; // la cookie se VALIDA: el cliente puede manipularla a mano
     }
     if (tipo === "todos") tipo = "";
 
@@ -39,7 +39,9 @@ export const equiposController = {
     res.render("equipos/ficha", { titulo: equipo.nombre, equipo });
   },
 
-  // POST /preferencias
+  // POST /preferencias: guarda en una cookie el tipo de equipo que el usuario prefiere ver
+  // por defecto en el catálogo. Es una simple preferencia de interfaz, NUNCA se usa para
+  // decidir permisos (por eso se puede manipular sin riesgo, pero aun así se valida).
   guardarPreferencia(req, res) {
     const tipo = req.body.tipo;
     if (!TIPOS_EQUIPO.includes(tipo)) {
@@ -47,7 +49,7 @@ export const equiposController = {
     }
     res.cookie(COOKIE_PREFERENCIA, tipo, {
       maxAge: TREINTA_DIAS, // dura 30 días aunque cierres el navegador
-      httpOnly: true, // JS del navegador no puede leerla
+      httpOnly: true, // JS del navegador no puede leerla (mitiga robo de la cookie vía XSS)
       sameSite: "lax",
       secure: config.esProduccion, // en producción, solo por HTTPS
     });
